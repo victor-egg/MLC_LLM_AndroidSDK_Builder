@@ -1,10 +1,12 @@
 # MLC-LLM Android SDK 构建
 
+Language: [`中文`](README.md) [`English`](README_EN.md)
+
 ## 概述
 
 本仓库已配置自动化的 GitHub Actions 工作流，填写需要构建的模型，自动构建Android SDK
 
-### 快速开始
+### 🚀 快速开始
 
 1. 在 GitHub 仓库中进入 **Actions** 标签页
 2. 选择 **Builder** 工作流
@@ -18,23 +20,25 @@
 5. 点击 **Run workflow** 开始执行
 6. 构建完成后到 **Releases** 中下载 Android SDK
 
-### MLC-LLM (Machine Learning Compilation) 模型命名格式
+### 模型选择指南
 
+#### 推荐模型来源
 优先选择 MLC-LLM 官方量化模型,拥有更好的兼容性与性能优化 [`https://huggingface.co/mlc-ai`](https://huggingface.co/mlc-ai)
-此次使用[`mlc-ai/Qwen3-1.7B-q4f16_1-MLC`](https://huggingface.co/mlc-ai/Qwen3-1.7B-q4f16_1-MLC)举例
 
-#### 1. `Qwen3` (模型家族)
+#### 模型命名规则解析
+[`mlc-ai/Qwen3-1.7B-q4f16_1-MLC`](https://huggingface.co/mlc-ai/Qwen3-1.7B-q4f16_1-MLC) 举例
+##### 1. `Qwen3` (模型家族)
 *   **含义**：指的是 **Qwen (通义千问)** 系列模型的第 3 代（或者用户自定义的某个版本，目前主流是 Qwen2.5，Qwen3 可能是最新发布或为了演示）。
 *   **来源**：阿里云 (Alibaba Cloud) 开发的开源大语言模型。
 
-#### 2. `1.7B` (参数量)
+##### 2. `1.7B` (参数量)
 *   **含义**：**1.7 Billion (17亿)** 参数。
 *   **意义**：
     *   这是一个 **小语言模型 (SLM)**。
     *   相比于 7B 或 72B 的模型，1.7B 非常轻量。
     *   **适用场景**：非常适合 **Android 手机** 或 **iOS 设备** 本地运行，因为它的内存占用低，推理速度快。
 
-#### 3. `q4f16_1` (量化编码格式 - 核心部分)
+##### 3. `q4f16_1` (量化编码格式 - 核心部分)
 这是 MLC-LLM 特有的量化命名方式，决定了模型的大小和在手机 GPU 上的运行效率。
 
 *   **`q4` (Quantization 4-bit)**：
@@ -53,17 +57,18 @@
         *   `q4f16_0`: 通常是 Group Size 128 或不分组。体积最小，但精度稍差。
         *   `q4f16_1`: **精度更高 (Perplexity 更低)**，虽然体积比 `_0` 微微大一点点，但在小模型（如 1.7B）上，**为了保证回答质量，强烈推荐使用 `_1`**。
 
-### 将 MLC-LLM Android SDK 添加到你的项目
+### 集成 SDK 到项目
 
 详细信息见 [`https://llm.mlc.ai/docs/deploy/android.html`](https://llm.mlc.ai/docs/deploy/android.html)
 
 ### 构建环境
 
-该工作流会自动配置以下环境:
-- **操作系统**: Ubuntu Linux (最新版本)
-- **Python**: 3.13
-- **Android NDK**: 27.3.13750724
-- **Java**: 21 (Jetbrains 发行版)
-- **Rust**: 最新稳定版
+| 组件 | 版本 | 说明 |
+|------|------|------|
+| **操作系统** | Ubuntu Linux (最新 LTS) | 稳定的构建环境 |
+| **Python** | 3.13 | 模型转换与脚本执行 |
+| **Android NDK** | 27.3.13750724 | 原生代码编译 |
+| **Java** | 21 (JetBrains Runtime) | Android 构建工具链 |
+| **Rust** | 最新稳定版 | 高性能运行时组件 |
 
 详细信息见 [`.github/workflows/Builder.yml`](.github/workflows/Builder.yml)

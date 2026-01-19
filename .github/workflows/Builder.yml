@@ -21,11 +21,11 @@ on:
         default: ''
       estimated_vram_bytes:
         description: '运行模型所需的vRAM'
-        required: false
+        required: true
         default: '3000000000'
 
 jobs:
-  build:
+  Builder:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -126,15 +126,20 @@ jobs:
         run: |
           python -m mlc_llm package
           ls -al
+
+      - name: 打包构建文件
+        run: |
+          ls -al dist/
+          zip -r sdk.zip dist/
       
       - name: 上传构建文件
         uses: actions/upload-artifact@v4
         with:
-          name: Android SDK
-          path: dist/
-          retention-days: 7
+          name: sdk
+          path: sdk.zip
+          retention-days: 30
 
-      - name: 发布文件
+      - name: 发布构建文件
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.release_tag }}
@@ -142,6 +147,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            dist/*
+            sdk.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

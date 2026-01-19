@@ -129,6 +129,9 @@ jobs:
 
       - name: 打包构建文件
         run: |
+          rm -rf mlc-llm
+          rm -rf model
+          rm -rf build
           ls -al dist/
           zip -r sdk.zip dist/
       

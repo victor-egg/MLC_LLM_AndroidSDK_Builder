@@ -10,7 +10,7 @@ on:
       release_name:
         description: '发布名称'
         required: false
-        default: 'Release'
+        default: ''
       model:
         description: 'huggingface模型地址'
         required: true
@@ -31,8 +31,33 @@ jobs:
       contents: write
     
     steps:
-      - name: 检出仓库
-        uses: actions/checkout@v4
+      - name: 释放磁盘空间
+        run: |
+          df -h
+          # 不使用的工具
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf /usr/share/az_7.0.0
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /opt/hostedtoolcache/go
+          sudo rm -rf /opt/hostedtoolcache/Ruby
+          # Docker
+          sudo docker image prune --all --force
+          sudo rm -rf /var/lib/docker
+          # Android SDK
+          if [ -d "$ANDROID_HOME" ]; then
+            echo "clean Android SDK"
+            sudo rm -rf $ANDROID_HOME/ndk
+            sudo rm -rf $ANDROID_HOME/ndk-bundle
+            sudo rm -rf $ANDROID_HOME/emulator
+            sudo rm -rf $ANDROID_HOME/system-images
+            sudo rm -rf $ANDROID_HOME/platforms
+          fi
+          # 清理 apt 缓存
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          df -h
 
       - name: 安装 Python
         uses: actions/setup-python@v5
@@ -46,7 +71,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install git-lfs git
-          python -m pip install --pre -U -f https://mlc.ai/wheels mlc-llm-nightly-cpu mlc-ai-nightly-cpu
+          python -m pip install --no-cache-dir --pre -U -f https://mlc.ai/wheels mlc-llm-nightly-cpu mlc-ai-nightly-cpu
           python -c "import mlc_llm; print(mlc_llm)"
 
       - name: 安装 JDK
@@ -67,9 +92,9 @@ jobs:
 
       - name: 拉取 MLC-LLM 源码
         run: |
-          git clone https://github.com/mlc-ai/mlc-llm.git
+          git clone https://github.com/mlc-ai/mlc-llm.git --depth 1
           cd mlc-llm
-          git submodule update --init --recursive
+          git submodule update --init --recursive --depth 1
           echo "MLC_LLM_SOURCE_DIR=${PWD}" >> $GITHUB_ENV
           echo "TVM_SOURCE_DIR=${PWD}/3rdparty/tvm" >> $GITHUB_ENV
           cd ..
